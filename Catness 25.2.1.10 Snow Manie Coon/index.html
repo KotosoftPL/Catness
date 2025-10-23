@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Catness Pręga 25.2.1.10 Snow Maine Coon</title>
+  <style>
+    body {
+      background-color: #0e3d77;
+      background-image: none;
+      font-family: 'Courier New', monospace;
+      margin: 0;
+      color: #fff;
+    }
+
+    #topBar {
+      background-color: #001f3f;
+      color: #fff;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 2000;
+    }
+
+    .menuItem {
+      margin-right: 14px;
+      font-size: 14px;
+    }
+
+    #macDock {
+      background-color: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(8px);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 20px;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 16px;
+      z-index: 1000;
+    }
+
+    #macDock img {
+      width: 64px;
+      height: 64px;
+      transition: transform 0.2s ease;
+      cursor: pointer;
+    }
+
+    #macDock img:hover {
+      transform: scale(1.3);
+    }
+
+    #macDock {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 16px;
+      padding: 16px 24px;
+      background: linear-gradient(to top, rgba(255,255,255,0.3), rgba(255,255,255,0.05));
+      backdrop-filter: blur(12px);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+      clip-path: polygon(0% 100%, 5% 0%, 95% 0%, 100% 100%);
+      z-index: 999;
+    }
+
+    .appWindow {
+      background-color: rgba(10, 42, 89, 0.85);
+      backdrop-filter: blur(6px);
+      border: 2px solid #fff;
+      box-shadow: 0 0 20px #000;
+      padding: 15px;
+      position: fixed;
+      top: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 500px;
+      z-index: 9999;
+      display: none;
+      border-radius: 8px;
+      color: #fff;
+    }
+
+    .windowControls button {
+      background-color: #1d6edc;
+      color: #fff;
+      border: none;
+      padding: 8px;
+      margin: 3px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    @keyframes bounce {
+      0%   { transform: scale(1); }
+      30%  { transform: scale(1.4) translateY(-10px); }
+      60%  { transform: scale(1.2) translateY(0); }
+      100% { transform: scale(1); }
+    }
+
+    .bounce {
+      animation: bounce 0.4s ease;
+    }
+
+    #macDock img[alt="Kosz"]:hover {
+      transform: scale(1.2);
+      filter: brightness(1.2);
+    }
+  </style>
+</head>
+<body>
+<!-- Pasek górny -->
+<div id="topBar">
+  <img src="icons/kotosoft.png" alt="Kotosoft Logo" id="kotoLogo" style="width:18px; height:18px; margin-right:10px; cursor:pointer;">
+  <span class="menuItem">Finder</span>
+  <span class="menuItem">Plik</span>
+  <span class="menuItem">Edycja</span>
+  <span class="menuItem">Widok</span>
+  <span class="menuItem">Pomoc</span>
+  <span id="clock" class="menuItem" style="margin-left:auto;">--:--</span>
+</div>
+
+<div id="exitMenu" style="display:none; position:absolute; top:30px; left:10px; background:rgba(0,0,0,0.7); padding:10px; border-radius:6px; backdrop-filter:blur(6px); z-index:3000;">
+  <button onclick="window.location.href='lockscreen.html'">Wyloguj</button>
+  <button onclick="alert('Trwa zamykanie...')">Zamknij</button>
+  <button onclick="openAbout()">O Catnessie</button>
+</div>
+
+<!-- Nagłówek Sagama -->
+<div style="text-align:center; margin-top:30px;">
+  <img src="icons/sagam.png" alt="Sagam Icon" style="width:64px; height:auto;">
+</div>
+<h2 style="text-align:center; margin-top:60px;">🐾 Catness Pręga 25.2.1.10 Snow Maine Coon — Sagam Edition</h2>
+
+<!-- Dock z ikonami -->
+<div id="macDock">
+  <img src="icons/shell.png" alt="SagamShell" onclick="openShell()">
+  <img src="icons/browser.png" alt="Browser" onclick="openBrowser()">
+  <img src="icons/library.png" alt="Library" onclick="openLibrary()">
+  <img src="icons/battle.png" alt="Battle" onclick="openBattleGame()">
+  <img src="icons/chrupek.png" alt="Chrupek" onclick="openChrupek()">
+  <img src="icons/settings.png" alt="Settings" onclick="openSettings()">
+  <img src="icons/calculator.png" alt="Kalkulator" onclick="openCalculator()">
+  <img src="icons/trash.png" alt="Kosz" onclick="openTrash()" title="Kosz">
+</div>
+<!-- SagamShell -->
+<div id="shellWindow" class="appWindow">
+  <div class="windowControls">
+    <button onclick="closeWindow(this)">🟥</button>
+    <button onclick="minimizeWindow(this)">🟨</button>
+    <button onclick="fullscreenWindow(this)">🟩</button>
+  </div>
+  <div id="shellOutput">SagamShell aktywny. Wpisz komendę:</div>
+  <input id="shellInput" type="text" placeholder="Miłego Kodowania" onkeydown="runShell(event)">
+</div>
+
+<!-- Catness Browser -->
+<div id="browserWindow" class="appWindow">
+  <div class="windowControls">
+    <button onclick="closeWindow(this)">🟥</button>
+    <button onclick="minimizeWindow(this)">🟨</button>
+    <button onclick="fullscreenWindow(this)">🟩</button>
+  </div>
+  <h3>🌐 Catness Browser</h3>
+  <button onclick="window.open('https://youtube.com')">YouTube</button>
+  <button onclick="window.open('https://gmail.com')">Gmail</button>
+  <button onclick="window.open('https://office.com')">Office365</button>
+  <iframe id="dynamicFrame" style="width:100%; height:300px; margin-top:10px; border:2px solid #fff;"></iframe>
+</div>
+
+<!-- Biblioteki Catnessa -->
+<div id="libraryWindow" class="appWindow">
+  <div class="windowControls">
+    <button onclick="closeWindow(this)">🟥</button>
+    <button onclick="minimizeWindow(this)">🟨</button>
+    <button onclick="fullscreenWindow(this)">🟩</button>
+  </div>
+  <h3>📚 Biblioteki Catness</h3>
+  <ul>
+    <li onclick="alert('Otwieram KocieSprawy.txt')">📁 KocieSprawy.txt</li>
+    <li onclick="alert('Otwieram SagamShell.log')">📝 SagamShell.log</li>
+    <li onclick="alert('Pokazuję PixelKot.png')">🖼️ PixelKot.png</li>
+  </ul>
+</div>
+
+<!-- Bitwa z Pieskiem -->
+<div id="battleWindow" class="appWindow">
+  <div class="windowControls">
+    <button onclick="closeWindow(this)">🟥</button>
+    <button onclick="minimizeWindow(this)">🟨</button>
+    <button onclick="fullscreenWindow(this)">🟩</button>
+  </div>
+  <h3>⚔️ Bitwa z Pieskiem</h3>
+  <p>😼 Sagam HP: <span id="catHpDisplay">100</span></p>
+  <p>🐶 Piesek HP: <span id="dogHpDisplay">100</span></p>
+  <button onclick="attackDog()">💥 Zaatakuj</button>
+  <button onclick="mruczHeal()">🎵 Mrucz obronnie</button>
+  <button onclick="dogAttack()">⚔️ Piesek atakuje</button>
+</div>
+
+<!-- Chrupek Alert -->
+<div id="chrupekWindow" class="appWindow">
+  <div class="windowControls">
+    <button onclick="closeWindow(this)">🟥</button>
+    <button onclick="minimizeWindow(this)">🟨</button>
+    <button onclick="fullscreenWindow(this)">🟩</button>
+  </div>
+  <h3>🚨 CHRUPEK ALERT</h3>
+  <p><strong>Cząsteczka chrupka wykryta w obrębie gałki ocznej.</strong></p>
+  <ul>
+    <li>👁️ Przemyj oko wodą lub solą fizjologiczną.</li>
+    <li>🧼 Użyj jałowego gazika, NIE pocieraj ręką!</li>
+    <li>🧊 Zimny okład na powiekę.</li>
+    <li>🏥 Skontaktuj się z okulistą, jeśli ból nie ustępuje.</li>
+  </ul>
+</div>
+
+<!-- Kalkulator -->
+<div id="calcWindow" class="appWindow">
+  <div class="windowControls">
+    <button onclick="closeWindow(this)">🟥</button>
+    <button onclick="minimizeWindow(this)">🟨</button>
+    <button onclick="fullscreenWindow(this)">🟩</button>
+  </div>
+  <h3>🧮 Catness Calculator</h3>
+  <input id="calcDisplay" readonly style="width:100%; padding:8px; margin-bottom:10px; font-size:18px;">
+  <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:6px;">
+    <button onclick="pressCalc('7')">7</button>
+    <button onclick="pressCalc('8')">8</button>
+    <button onclick="pressCalc('9')">9</button>
+    <button onclick="pressCalc('/')">÷</button>
+    <button onclick="pressCalc('4')">4</button>
+    <button onclick="pressCalc('5')">5</button>
+    <button onclick="pressCalc('6')">6</button>
+    <button onclick="pressCalc('*')">×</button>
+    <button onclick="pressCalc('1')">1</button>
+    <button onclick="pressCalc('2')">2</button>
+    <button onclick="pressCalc('3')">3</button>
+    <button onclick="pressCalc('-')">−</button>
+    <button onclick="pressCalc('0')">0</button>
+    <button onclick="pressCalc('.')">.</button>
+    <button onclick="pressCalc('=')">=</button>
+    <button onclick="pressCalc('+')">+</button>
+    <button onclick="clearCalc()" style="grid-column: span 4;">🧹 Wyczyść</button>
+  </div>
+</div>
+
+<!-- O Catnessie -->
+<div id="aboutWindow" class="appWindow">
+  <div class="windowControls">
+    <button onclick="closeWindow(this)">🟥</button>
+    <button onclick="minimizeWindow(this)">🟨</button>
+    <button onclick="fullscreenWindow(this)">🟩</button>
+  </div>
+   <h3>🐾 Catness Pręga</h3>
+  <p><strong>Wersja:</strong> 25.2.1.10 Snow Maine Coon</p>
+  <button onclick="alert('🔧 Wkrótce.')">Aktualizacja...</button>
+  <p style="margin-top:12px;">© Kotosoft 2022–2025</p>
+</div>
+
+<script>
+// Zegar
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById("clock").textContent = `${h}:${m}`;
+}
+setInterval(updateClock, 60000);
+updateClock();
+
+// Menu Wyjścia
+document.getElementById("kotoLogo").onclick = () => {
+  const menu = document.getElementById("exitMenu");
+  menu.style.display = menu.style.display === "none" ? "block" : "none";
+};
+
+// Shell
+function runShell(e) {
+  if (e.key !== "Enter") return;
+  const input = document.getElementById("shellInput").value.trim();
+  const out = document.getElementById("shellOutput");
+  out.innerHTML += `<br><span style="color:#0ff;">> ${input}</span>`;
+  const lower = input.toLowerCase();
+
+  if (lower === "system info") {
+    out.innerHTML += "<br>🖥️ Catness Pręga 25.2.1.10 Snow Maine Coon — Sagam Edition";
+  } else if (lower === "kot.mrucz()") {
+    out.innerHTML += "<br>🎵 Sagam: Mruczę z pixelową duszą...";
+  } else if (lower === "dog and cat battle") {
+    out.innerHTML += "<br>🎮 Uruchamianie bitwy...";
+    openBattleGame();
+  } else if (lower === "catness.browser()") {
+    out.innerHTML += "<br>🌐 Otwieram przeglądarkę...";
+    openBrowser();
+  } else if (lower === "catness.settings()") {
+    out.innerHTML += "<br>⚙️ Otwieram ustawienia...";
+    openSettings();
+  } else if (lower === "activate.catness()") {
+    out.innerHTML += "<br>🔐 Otwieram aktywację systemu...";
+    openActivation();
+  } else if (input.startsWith("open(") && input.endsWith(")")) {
+    const urlRaw = input.slice(5, -1).trim().replace(/^["']|["']$/g, "");
+    const url = urlRaw.startsWith("http") ? urlRaw : "https://" + urlRaw;
+    openBrowserWithURL(url);
+    out.innerHTML += `<br>🔗 Otwieram <code>${url}</code> w Catness Browser...`;
+  } else {
+    out.innerHTML += `<br>⚠️ Nieznana komenda: <code>${input}</code>`;
+  }
+
+  document.getElementById("shellInput").value = "";
+  out.scrollTop = out.scrollHeight;
+}
+
+function openBrowserWithURL(url) {
+  const browserWindow = document.getElementById("browserWindow");
+  browserWindow.style.display = "block";
+  const iframe = document.getElementById("dynamicFrame");
+  iframe.src = url;
+}
+
+// Kalkulator
+let calcInput = "";
+
+function pressCalc(val) {
+  if (val === "=") {
+    try {
+      calcInput = eval(calcInput).toString();
+    } catch {
+      calcInput = "Błąd";
+    }
+  } else {
+    calcInput += val;
+  }
+  document.getElementById("calcDisplay").value = calcInput;
+}
+
+function clearCalc() {
+  calcInput = "";
+  document.getElementById("calcDisplay").value = "";
+}
+// Bitwa
+let catHp = 100;
+let dogHp = 100;
+
+function openBattleGame() {
+  catHp = 100;
+  dogHp = 100;
+  document.getElementById("catHpDisplay").textContent = catHp;
+  document.getElementById("dogHpDisplay").textContent = dogHp;
+  document.getElementById("battleWindow").style.display = "block";
+}
+
+function attackDog() {
+  const damage = Math.floor(Math.random() * 15) + 5;
+  dogHp -= damage;
+  if (dogHp < 0) dogHp = 0;
+  document.getElementById("dogHpDisplay").textContent = dogHp;
+  alert(`😼 Sagam zaatakował! 🐶 -${damage} HP`);
+  checkVictory();
+}
+
+function mruczHeal() {
+  const heal = Math.floor(Math.random() * 10) + 5;
+  catHp += heal;
+  if (catHp > 100) catHp = 100;
+  document.getElementById("catHpDisplay").textContent = catHp;
+  alert(`🎵 Sagam mruczy... +${heal} HP`);
+}
+
+function dogAttack() {
+  const damage = Math.floor(Math.random() * 20) + 5;
+  catHp -= damage;
+  if (catHp < 0) catHp = 0;
+  document.getElementById("catHpDisplay").textContent = catHp;
+  alert(`🐶 Piesek zaatakował! 😼 -${damage} HP`);
+  checkVictory();
+}
+
+function checkVictory() {
+  if (catHp === 0) {
+    alert("😿 Sagam przegrał bitwę... Piesek zwyciężył!");
+  } else if (dogHp === 0) {
+    alert("😼 Sagam wygrał! Miauknięcie zwycięstwa rozbrzmiewa!");
+  }
+}
+
+// Otwieranie okien
+function openShell() {
+  document.getElementById("shellWindow").style.display = "block";
+}
+function openBrowser() {
+  document.getElementById("browserWindow").style.display = "block";
+}
+function openLibrary() {
+  document.getElementById("libraryWindow").style.display = "block";
+}
+function openChrupek() {
+  document.getElementById("chrupekWindow").style.display = "block";
+}
+function openCalculator() {
+  document.getElementById("calcWindow").style.display = "block";
+}
+function openAbout() {
+  document.getElementById("aboutWindow").style.display = "block";
+}
+function openSettings() {
+  const win = document.createElement("div");
+  win.className = "appWindow";
+  win.style.display = "block";
+  win.style.padding = "30px";
+  win.style.overflow = "auto";
+  win.innerHTML = `
+    <div class="windowControls">
+      <button onclick="closeWindow(this)">🟥</button>
+      <button onclick="minimizeWindow(this)">🟨</button>
+      <button onclick="fullscreenWindow(this)">🟩</button>
+    </div>
+    <h3>⚙️ Ustawienia Catness</h3>
+    <h4>🔐 Aktywacja systemu</h4>
+    <button onclick="openActivation()">Aktywuj Catness Pręga</button>
+    <hr style="margin:15px 0; border-color:#fff;">
+    <h4>🎨 Motyw systemu</h4>
+    <select onchange="changeTheme(this.value)" style="padding:5px;">
+      <option value="default">Domyślny</option>
+      <option value="dark">Ciemny Pixel</option>
+      <option value="retro95">Retro 95</option>
+      <option value="neon">Neon Pixel</option>
+    </select>
+    <h4>🖼️ Tapeta systemu</h4>
+    <select onchange="changeWallpaper(this.value)">
+      <option value="none">Brak tapety</option>
+      <option value="wallpapers/sagam.png">Sagam Pixel</option>
+      <option value="wallpapers/retro95.png">Retro 95</option>
+      <option value="wallpapers/miaukniecie.png">Miauknięcie</option>
+      <option value="wallpapers/Kotosoft.png">Sagamek</option>
+    </select>
+  `;
+  document.body.appendChild(win);
+}
+
+function openActivation() {
+  const win = document.createElement("div");
+  win.className = "appWindow";
+  win.style.display = "block";
+  win.innerHTML = `
+    <div class="windowControls">
+      <button onclick="closeWindow(this)">🟥</button>
+      <button onclick="minimizeWindow(this)">🟨</button>
+      <button onclick="fullscreenWindow(this)">🟩</button>
+    </div>
+    <h3>🔐 Aktywacja Catness Pręga</h3>
+    <p>Wprowadź kod aktywacyjny Sagama:</p>
+    <input type="text" id="activationCode" placeholder="MIAU-2025-SAGAM" style="width:80%; padding:8px;">
+    <button onclick="activateSystem()">Aktywuj</button>
+    <div id="activationStatus" style="margin-top:10px;"></div>
+  `;
+  document.body.appendChild(win);
+}
+
+function activateSystem() {
+  const code = document.getElementById("activationCode").value.trim();
+  const status = document.getElementById("activationStatus");
+  if (code === "MIAU-2025-SAGAM") {
+    status.innerHTML = "✅ System aktywowany! Miauknięcie potwierdzenia.";
+  } else {
+    status.innerHTML = "❌ Nieprawidłowy kod aktywacyjny.";
+  }
+}
+
+function closeWindow(btn) {
+  const win = btn.closest(".appWindow");
+  if (!win) return;
+
+  if (win.id === "browserWindow") {
+    const iframe = document.getElementById("dynamicFrame");
+    if (iframe) iframe.src = "about:blank";
+  }
+
+  if (win.id === "shellWindow") {
+    const out = document.getElementById("shellOutput");
+    const input = document.getElementById("shellInput");
+    if (out) out.innerHTML = "SagamShell aktywny. Wpisz komendę:";
+    if (input) input.value = "";
+  }
+
+  if (win.id === "calcWindow") {
+    if (typeof clearCalc === "function") clearCalc();
+  }
+
+  if (win.id === "chrupekWindow") {
+    const chrupek = document.getElementById("chrupekWindow");
+    if (chrupek) chrupek.scrollTop = 0;
+  }
+
+  if (win.id === "battleWindow") {
+    catHp = 100;
+    dogHp = 100;
+    document.getElementById("catHpDisplay").textContent = catHp;
+    document.getElementById("dogHpDisplay").textContent = dogHp;
+  }
+
+  if (win.id === "libraryWindow") {
+    // Możesz dodać czyszczenie, jeśli dynamiczne
+  }
+
+  if (win.innerHTML.includes("Ustawienia Catness") || win.innerHTML.includes("Aktywacja Catness")) {
+    win.remove();
+    return;
+  }
+
+  win.style.display = "none";
+}
+
+function minimizeWindow(btn) {
+  const win = btn.closest(".appWindow");
+  if (win) win.style.display = "none";
+}
+
+function fullscreenWindow(btn) {
+  const win = btn.closest(".appWindow");
+  if (win) {
+    win.style.top = "0";
+    win.style.left = "0";
+    win.style.transform = "none";
+    win.style.width = "100vw";
+    win.style.height = "100vh";
+    win.style.borderRadius = "0";
+  }
+}
+// Motywy
+function changeTheme(theme) {
+  const windows = document.querySelectorAll(".appWindow");
+  const dock = document.getElementById("macDock");
+
+  let bodyColor, winBg, winBorder, winText, dockColor;
+
+  if (theme === "neon") {
+    bodyColor = "#000";
+    winBg = "#0f0f0f"; winBorder = "2px solid #00ffff"; winText = "#00ffff";
+    dockColor = "rgba(0, 255, 255, 0.2)";
+  } else if (theme === "retro95") {
+    bodyColor = "#008080";
+    winBg = "#C0C0C0"; winBorder = "2px solid #808080"; winText = "#000";
+    dockColor = "rgba(255,255,255,0.3)";
+  } else if (theme === "dark") {
+    bodyColor = "#111";
+    winBg = "#222"; winBorder = "2px solid #444"; winText = "#fff";
+    dockColor = "rgba(255,255,255,0.1)";
+  } else {
+    bodyColor = "#0e3d77";
+    winBg = "#0a2a59"; winBorder = "2px solid #fff"; winText = "#fff";
+    dockColor = "rgba(0,0,0,0.4)";
+  }
+
+  document.body.style.backgroundColor = bodyColor;
+  windows.forEach(win => {
+    win.style.backgroundColor = winBg;
+    win.style.border = winBorder;
+    win.style.color = winText;
+  });
+  dock.style.background = dockColor;
+}
+
+// Tapety
+function changeWallpaper(path) {
+  if (path === "none") {
+    document.body.style.backgroundImage = "none";
+  } else {
+    document.body.style.backgroundImage = `url('${path}')`;
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+  }
+}
+
+// Inicjalizacja domyślnej tapety przy starcie
+window.onload = function() {
+  changeWallpaper("none"); // lub "wallpapers/sagam.png" jeśli chcesz tapetę
+};
+
+function openTrash() {
+  alert("🗑️ Kosz jest pusty. Pixelowe śmieci zostały usunięte.");
+}
+</script>
+</body>
+</html>
