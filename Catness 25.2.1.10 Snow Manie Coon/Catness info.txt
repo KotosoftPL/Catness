@@ -1,9 +1,0 @@
-🧠 Dane systemowe:
-- Nazwa: Catness Pręga (Skrótowo Catness/Catness OS)
-- Wersja: 25.2 SP1
-- Status: Najnowsza wersja tworzona wspólnie z Copilotem
-- Elementy:
-- Motyw XP-style GUI
-- SagamShell jako pixelowy towarzysz systemowy
-- Mechanika portowa zabezpieczona przed solą
-- Funkcje diagnostyczne i komunikaty stylu 2001 Edition

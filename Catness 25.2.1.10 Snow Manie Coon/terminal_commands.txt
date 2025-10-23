@@ -1,6 +1,0 @@
-📂 Catness Terminal Commands
-─────────────────────────────
-kot.podrap()
-kot.mrucz()
-system info
-open catness\apps\games\dog and cat battle
